@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="pt-AO">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Área da Equipa | Gungo Agência &amp; Marketing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-deep:#0d1b2e; --navy-soft:#16294a; --cream:#faf7f0; --white:#fff;
+    --line:#e8e1d0; --ink:#122036; --ink-soft:#5a6273;
+    --gold:#c1932f; --gold-deep:#a9782a; --gold-light:#e7bf6a; --gold-bg:#fbf1dd;
+    --red:#c0392b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--cream); font-family:'Manrope',sans-serif; color:var(--ink); min-height:100vh;}
+  h1,h2,h3{font-family:'Fraunces',serif; font-weight:600;}
+  .center-wrap{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;}
+
+  .login-card{
+    background:var(--navy-deep); color:#fff; border-radius:24px; padding:48px 40px; width:100%; max-width:400px;
+  }
+  .login-card h1{font-size:1.5rem; margin-bottom:8px; color:#fff;}
+  .login-card p{color:#aab2c1; font-size:0.9rem; margin-bottom:28px;}
+  .login-card input{
+    width:100%; padding:14px 16px; border-radius:10px; border:1px solid rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.06); color:#fff; font-size:0.95rem; margin-bottom:14px; outline:none;
+  }
+  .login-card input:focus{border-color:var(--gold);}
+  .login-card button{
+    width:100%; padding:14px 16px; border-radius:10px; border:none; background:var(--gold); color:#fff;
+    font-weight:700; font-size:0.95rem; cursor:pointer; transition:background .25s ease;
+  }
+  .login-card button:hover{background:var(--gold-deep);}
+  .login-error{color:#ff9d8a; font-size:0.85rem; margin-top:12px; min-height:18px;}
+
+  /* Painel */
+  #panel{display:none;}
+  header.admin-header{
+    background:var(--navy-deep); color:#fff; padding:18px 32px; display:flex; align-items:center; justify-content:space-between;
+  }
+  header.admin-header h1{font-size:1.1rem; color:#fff;}
+  header.admin-header button{
+    background:transparent; border:1px solid rgba(255,255,255,0.2); color:#fff; padding:9px 18px; border-radius:999px;
+    font-weight:600; font-size:0.85rem; cursor:pointer; transition:all .2s ease;
+  }
+  header.admin-header button:hover{border-color:var(--gold-light); color:var(--gold-light);}
+
+  .admin-body{max-width:960px; margin:0 auto; padding:44px 24px;}
+  .panel-card{background:var(--white); border:1px solid var(--line); border-radius:20px; padding:34px; margin-bottom:32px;}
+  .panel-card h2{font-size:1.2rem; margin-bottom:22px;}
+  .form-row{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;}
+  @media (max-width:600px){.form-row{grid-template-columns:1fr;}}
+  input[type=text], select{
+    width:100%; padding:13px 16px; border-radius:10px; border:1px solid var(--line); background:var(--cream);
+    font-family:'Manrope',sans-serif; font-size:0.92rem; color:var(--ink); outline:none;
+  }
+  input[type=text]:focus, select:focus{border-color:var(--gold);}
+  input[type=file]{
+    width:100%; padding:13px 16px; border-radius:10px; border:1px dashed var(--line); background:var(--cream);
+    font-size:0.88rem; margin-bottom:16px;
+  }
+  .btn-gold{
+    background:var(--gold); color:#fff; border:none; padding:14px 26px; border-radius:999px; font-weight:700;
+    font-size:0.9rem; cursor:pointer; transition:background .2s ease;
+  }
+  .btn-gold:hover{background:var(--gold-deep);}
+  .btn-gold:disabled{opacity:0.5; cursor:not-allowed;}
+  .upload-status{margin-top:14px; font-size:0.85rem; color:var(--ink-soft);}
+
+  .item-list{display:flex; flex-direction:column; gap:12px;}
+  .item-row{
+    display:flex; align-items:center; gap:16px; padding:12px; border:1px solid var(--line); border-radius:14px;
+  }
+  .item-row img{width:64px; height:64px; object-fit:cover; border-radius:10px; background:var(--gold-bg);}
+  .item-row .meta{flex:1;}
+  .item-row .meta strong{display:block; font-size:0.92rem;}
+  .item-row .meta span{font-size:0.78rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.04em;}
+  .item-row button{
+    background:none; border:1px solid var(--red); color:var(--red); padding:8px 16px; border-radius:999px;
+    font-size:0.8rem; font-weight:700; cursor:pointer; transition:all .2s ease;
+  }
+  .item-row button:hover{background:var(--red); color:#fff;}
+  .empty-msg{color:var(--ink-soft); font-size:0.9rem;}
+</style>
+</head>
+<body>
+
+<div class="center-wrap" id="loginWrap">
+  <div class="login-card">
+    <h1>Área da Equipa</h1>
+    <p>Acesso exclusivo da Gungo Agência &amp; Marketing. Esta área não é para clientes.</p>
+    <input type="text" id="loginEmail" placeholder="E-mail">
+    <input type="password" id="loginPass" placeholder="Palavra-passe">
+    <button id="loginBtn">Entrar</button>
+    <button id="forgotBtn" type="button" style="background:none; border:none; color:var(--gold-light); font-size:0.82rem; margin-top:14px; cursor:pointer; text-decoration:underline;">Esqueci a palavra-passe</button>
+    <div class="login-error" id="loginError"></div>
+    <p style="font-size:0.78rem; color:#8a93a6; margin-top:18px; border-top:1px solid rgba(255,255,255,0.1); padding-top:14px;">
+      Não recebeu o e-mail de recuperação? Fale connosco pelo WhatsApp:
+      <a href="https://wa.me/244942375519" target="_blank" rel="noopener" style="color:var(--gold-light); font-weight:700;">+244 942 375 519</a>
+    </p>
+  </div>
+</div>
+
+<div id="panel">
+  <header class="admin-header">
+    <h1>Painel &middot; Gungo Agência &amp; Marketing</h1>
+    <button id="logoutBtn">Sair</button>
+  </header>
+
+  <div class="admin-body">
+    <div class="panel-card">
+      <h2>Adicionar projecto ao portfólio</h2>
+      <p style="font-size:0.82rem; color:var(--ink-soft); margin-bottom:16px;">
+        Dica: para criar um <strong>álbum</strong> com várias fotos do mesmo trabalho, usa exactamente o mesmo título em cada foto — elas ficam agrupadas automaticamente no site.<br>
+        Tamanho recomendado da imagem: <strong>1200 × 900px</strong> (proporção 4:3), formato JPG ou PNG.
+      </p>
+      <div class="form-row">
+        <input type="text" id="itemTitulo" placeholder="Título do projecto">
+        <select id="itemCategoria">
+          <option>Marketing Digital</option>
+          <option>Tráfego Pago</option>
+          <option>Design Gráfico</option>
+        </select>
+      </div>
+      <input type="file" id="itemFile" accept="image/*">
+      <button class="btn-gold" id="uploadBtn">Publicar no site</button>
+      <div class="upload-status" id="uploadStatus"></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Projectos publicados</h2>
+      <div class="item-list" id="itemList">
+        <p class="empty-msg">A carregar...</p>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Adicionar foto de bastidores / atividade</h2>
+      <p style="font-size:0.82rem; color:var(--ink-soft); margin-bottom:16px;">Tamanho recomendado: 1000 × 1000px (quadrada). A categoria é opcional — se preencheres, cria abas de filtro no site.</p>
+      <div class="form-row">
+        <input type="text" id="activityLegenda" placeholder="Legenda (opcional)">
+        <input type="text" id="activityCategoria" placeholder="Categoria (opcional, ex: Produção)">
+      </div>
+      <input type="file" id="activityFile" accept="image/*" style="margin-top:14px;">
+      <button class="btn-gold" id="activityUploadBtn" style="margin-top:16px;">Publicar foto</button>
+      <div class="upload-status" id="activityUploadStatus"></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Fotos de bastidores publicadas</h2>
+      <div class="item-list" id="activityList">
+        <p class="empty-msg">A carregar...</p>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Adicionar logo de parceiro</h2>
+      <p style="font-size:0.82rem; color:var(--ink-soft); margin-bottom:16px;">
+        Tamanho recomendado: imagem quadrada, mínimo <strong>400 × 400px</strong>, de preferência com fundo transparente (PNG) e o logo centrado.
+      </p>
+      <input type="text" id="partnerNome" placeholder="Nome do parceiro / marca">
+      <input type="file" id="partnerFile" accept="image/*">
+      <button class="btn-gold" id="partnerUploadBtn">Publicar logo</button>
+      <div class="upload-status" id="partnerUploadStatus"></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Adicionar depoimento</h2>
+      <div class="form-row">
+        <input type="text" id="testiNome" placeholder="Nome do cliente">
+        <input type="text" id="testiCargo" placeholder="Cargo / Empresa (opcional)">
+      </div>
+      <div class="full" style="margin-top:14px;">
+        <input type="text" id="testiTexto" placeholder="Texto do depoimento">
+      </div>
+      <button class="btn-gold" id="testiSaveBtn" style="margin-top:16px;">Publicar depoimento</button>
+      <div class="upload-status" id="testiSaveStatus"></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Depoimentos publicados</h2>
+      <div class="item-list" id="testiList">
+        <p class="empty-msg">A carregar...</p>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Avaliações recebidas</h2>
+      <div class="item-list" id="ratingsList">
+        <p class="empty-msg">A carregar...</p>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Sugestões recebidas</h2>
+      <p style="font-size:0.82rem; color:var(--ink-soft); margin-bottom:16px;">Estas mensagens não são visíveis no site — só aqui, na área da equipa.</p>
+      <div class="item-list" id="suggestionsList">
+        <p class="empty-msg">A carregar...</p>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Editar Tabela de Preços</h2>
+      <p style="font-size:0.82rem; color:var(--ink-soft); margin-bottom:16px;">Só precisas de preencher o que quiseres mudar — o resto mantém-se como está.</p>
+
+      <h3 style="font-size:0.95rem; margin-bottom:12px; color:var(--gold-deep);">Planos mensais</h3>
+      <div class="form-row">
+        <input type="text" id="pInicial" placeholder="Plano Inicial (ex: 50.000)">
+        <input type="text" id="pEssencial" placeholder="Plano Essencial (ex: 85.000)">
+      </div>
+      <div class="form-row" style="margin-top:14px;">
+        <input type="text" id="pProfissional" placeholder="Plano Profissional (ex: 140.000)">
+        <input type="text" id="pPremium" placeholder="Plano Premium (ex: 220.000)">
+      </div>
+
+      <h3 style="font-size:0.95rem; margin:26px 0 12px; color:var(--gold-deep);">Serviços à parte</h3>
+      <div class="form-row">
+        <input type="text" id="pTrafego" placeholder="Tráfego Pago (ex: 30.000 – 60.000 Kz/mês)">
+        <input type="text" id="pGoogleAds" placeholder="Google Ads (ex: 40.000 – 80.000 Kz/mês)">
+      </div>
+      <div class="form-row" style="margin-top:14px;">
+        <input type="text" id="pVideo" placeholder="Vídeo publicitário">
+        <input type="text" id="pFoto" placeholder="Sessão de fotografia e vídeo">
+      </div>
+      <div class="form-row" style="margin-top:14px;">
+        <input type="text" id="pLogo" placeholder="Logótipo">
+        <input type="text" id="pIdentidade" placeholder="Identidade Visual">
+      </div>
+      <input type="text" id="pWebsite" placeholder="Website institucional" style="margin-top:14px;">
+
+      <button class="btn-gold" id="pricingSaveBtn" style="margin-top:22px;">Guardar preços</button>
+      <div class="upload-status" id="pricingSaveStatus"></div>
+    </div>
+
+    <div class="panel-card">
+      <h2>Editar Conteúdo do Site</h2>
+
+      <h3 style="font-size:0.95rem; margin-bottom:12px; color:var(--gold-deep);">Topo do site (hero)</h3>
+      <input type="text" id="contentHeroTitulo" placeholder="Título principal do topo">
+      <input type="text" id="contentHeroTexto" placeholder="Texto abaixo do título" style="margin-top:14px;">
+      <label style="display:block; font-size:0.82rem; color:var(--ink-soft); margin:14px 0 6px;">Imagem do topo (opcional — substitui o logo)<br>
+        <span style="font-weight:600;">Recomendado: foto quadrada, 1080 × 1080px — vai aparecer dentro de um círculo, por isso evita fotos com texto perto das bordas.</span>
+      </label>
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:10px;">
+        <div style="width:72px; height:72px; border-radius:50%; overflow:hidden; border:1px solid var(--line); background:var(--cream); flex-shrink:0; display:flex; align-items:center; justify-content:center;">
+          <img id="heroImgPreview" src="" alt="" style="width:100%; height:100%; object-fit:cover; display:none;">
+          <span id="heroImgPreviewEmpty" style="font-size:0.7rem; color:var(--ink-soft); text-align:center;">Sem imagem</span>
+        </div>
+        <input type="file" id="contentHeroImg" accept="image/*" style="flex:1;">
+      </div>
+
+      <h3 style="font-size:0.95rem; margin:26px 0 12px; color:var(--gold-deep);">Oferta / urgência (mostrada acima do formulário de contacto)</h3>
+      <input type="text" id="contentOferta" placeholder="Ex: Vagas limitadas este mês / Peça uma auditoria gratuita">
+
+      <h3 style="font-size:0.95rem; margin:26px 0 12px; color:var(--gold-deep);">Sobre o fundador</h3>
+      <input type="text" id="contentFounderNome" placeholder="Nome do fundador">
+      <textarea id="contentFounderBio" rows="3" placeholder="Breve biografia" style="width:100%; margin-top:14px; padding:13px 16px; border-radius:10px; border:1px solid var(--line); background:var(--cream); font-family:'Manrope',sans-serif; font-size:0.92rem; resize:vertical;"></textarea>
+      <label style="display:block; font-size:0.82rem; color:var(--ink-soft); margin:14px 0 6px;">Foto do fundador (recomendado: quadrada, 800 × 800px)</label>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div style="width:72px; height:72px; border-radius:50%; overflow:hidden; border:1px solid var(--line); background:var(--cream); flex-shrink:0; display:flex; align-items:center; justify-content:center;">
+          <img id="founderImgPreview" src="" alt="" style="width:100%; height:100%; object-fit:cover; display:none;">
+          <span id="founderImgPreviewEmpty" style="font-size:0.7rem; color:var(--ink-soft); text-align:center;">Sem foto</span>
+        </div>
+        <input type="file" id="contentFounderImg" accept="image/*" style="flex:1;">
+      </div>
+
+      <h3 style="font-size:0.95rem; margin:26px 0 12px; color:var(--gold-deep);">Contactos</h3>
+      <div class="form-row">
+        <input type="text" id="contentWhatsapp" placeholder="WhatsApp (ex: 244942375519)">
+        <input type="text" id="contentEmail" placeholder="E-mail (opcional)">
+      </div>
+      <div class="form-row" style="margin-top:14px;">
+        <input type="text" id="contentEndereco" placeholder="Endereço / localização (opcional)">
+        <input type="text" id="contentFacebook" placeholder="Link do Facebook">
+      </div>
+      <input type="text" id="contentInstagram" placeholder="Link do Instagram" style="margin-top:14px;">
+
+      <h3 style="font-size:0.95rem; margin:26px 0 12px; color:var(--gold-deep);">Números de destaque</h3>
+      <div class="form-row">
+        <input type="text" id="contentStatServicos" placeholder="Nº de Serviços (ex: 16)">
+        <input type="text" id="contentStatAreas" placeholder="Nº de Áreas (ex: 2)">
+        <input type="text" id="contentStatFoco" placeholder="% Foco (ex: 100)">
+      </div>
+
+      <button class="btn-gold" id="contentSaveBtn" style="margin-top:22px;">Guardar alterações</button>
+      <div class="upload-status" id="contentSaveStatus"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const loginWrap = document.getElementById('loginWrap');
+const panel = document.getElementById('panel');
+
+auth.onAuthStateChanged(user => {
+  if(user){
+    loginWrap.style.display = 'none';
+    panel.style.display = 'block';
+    loadItems();
+    loadTestimonials();
+    loadActivities();
+    loadRatings();
+    loadSuggestions();
+    loadPricing();
+    loadContent();
+  } else {
+    loginWrap.style.display = 'flex';
+    panel.style.display = 'none';
+  }
+});
+
+document.getElementById('loginBtn').addEventListener('click', () => {
+  const email = document.getElementById('loginEmail').value;
+  const pass = document.getElementById('loginPass').value;
+  const errBox = document.getElementById('loginError');
+  errBox.textContent = '';
+  auth.signInWithEmailAndPassword(email, pass).catch(err => {
+    errBox.textContent = 'E-mail ou palavra-passe incorrectos.';
+  });
+});
+
+document.getElementById('forgotBtn').addEventListener('click', () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const errBox = document.getElementById('loginError');
+  if(!email){
+    errBox.style.color = '#ff9d8a';
+    errBox.textContent = 'Escreve o teu e-mail no campo acima e clica novamente em "Esqueci a palavra-passe".';
+    return;
+  }
+  auth.sendPasswordResetEmail(email).then(() => {
+    errBox.style.color = '#8ee6a8';
+    errBox.textContent = 'E-mail de recuperação enviado! Verifica a tua caixa de entrada.';
+  }).catch(err => {
+    errBox.style.color = '#ff9d8a';
+    errBox.textContent = 'Não foi possível enviar o e-mail: ' + err.message;
+  });
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => auth.signOut());
+
+document.getElementById('uploadBtn').addEventListener('click', async () => {
+  const titulo = document.getElementById('itemTitulo').value.trim();
+  const categoria = document.getElementById('itemCategoria').value;
+  const fileInput = document.getElementById('itemFile');
+  const statusBox = document.getElementById('uploadStatus');
+  const btn = document.getElementById('uploadBtn');
+
+  if(!titulo || !fileInput.files[0]){
+    statusBox.textContent = 'Preenche o título e escolhe uma imagem.';
+    return;
+  }
+
+  btn.disabled = true;
+  statusBox.textContent = 'A enviar imagem...';
+
+  try {
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+
+    const uploadRes = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`,
+      { method: 'POST', body: formData }
+    );
+    const uploadData = await uploadRes.json();
+    if(!uploadData.secure_url){
+      throw new Error(uploadData.error ? uploadData.error.message : 'Falha ao enviar imagem para o Cloudinary');
+    }
+    const url = uploadData.secure_url;
+
+    await db.collection('portfolio').add({
+      titulo, categoria, imagemUrl: url,
+      criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    statusBox.textContent = 'Publicado com sucesso!';
+    document.getElementById('itemTitulo').value = '';
+    fileInput.value = '';
+    loadItems();
+  } catch(err){
+    console.error(err);
+    statusBox.textContent = 'Erro ao publicar: ' + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+function loadItems(){
+  const list = document.getElementById('itemList');
+  db.collection('portfolio').orderBy('criadoEm','desc').get().then(snapshot => {
+    if(snapshot.empty){
+      list.innerHTML = '<p class="empty-msg">Ainda não publicaste nenhum projecto.</p>';
+      return;
+    }
+    list.innerHTML = '';
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML = `
+        <img src="${d.imagemUrl}" alt="">
+        <div class="meta"><strong>${d.titulo || ''}</strong><span>${d.categoria || ''}</span></div>
+        <button data-id="${doc.id}">Remover</button>
+      `;
+      row.querySelector('button').addEventListener('click', () => {
+        if(confirm('Remover este projecto do site?')){
+          db.collection('portfolio').doc(doc.id).delete().then(loadItems);
+        }
+      });
+      list.appendChild(row);
+    });
+    loadPartners();
+  });
+}
+
+document.getElementById('partnerUploadBtn').addEventListener('click', async () => {
+  const nome = document.getElementById('partnerNome').value.trim();
+  const fileInput = document.getElementById('partnerFile');
+  const statusBox = document.getElementById('partnerUploadStatus');
+  const btn = document.getElementById('partnerUploadBtn');
+
+  if(!nome || !fileInput.files[0]){
+    statusBox.textContent = 'Preenche o nome e escolhe uma imagem do logo.';
+    return;
+  }
+
+  btn.disabled = true;
+  statusBox.textContent = 'A enviar logo...';
+
+  try {
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+
+    const uploadRes = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`,
+      { method: 'POST', body: formData }
+    );
+    const uploadData = await uploadRes.json();
+    if(!uploadData.secure_url){
+      throw new Error(uploadData.error ? uploadData.error.message : 'Falha ao enviar imagem para o Cloudinary');
+    }
+    const url = uploadData.secure_url;
+
+    await db.collection('partners').add({
+      nome, logoUrl: url,
+      criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    statusBox.textContent = 'Logo publicado com sucesso!';
+    document.getElementById('partnerNome').value = '';
+    fileInput.value = '';
+    loadPartners();
+  } catch(err){
+    console.error(err);
+    statusBox.textContent = 'Erro ao publicar: ' + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+function loadPartners(){
+  const list = document.getElementById('partnerList');
+  db.collection('partners').orderBy('criadoEm','desc').get().then(snapshot => {
+    if(snapshot.empty){
+      list.innerHTML = '<p class="empty-msg">Ainda não publicaste nenhum parceiro.</p>';
+      return;
+    }
+    list.innerHTML = '';
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML = `
+        <img src="${d.logoUrl}" alt="">
+        <div class="meta"><strong>${d.nome || ''}</strong></div>
+        <button data-id="${doc.id}">Remover</button>
+      `;
+      row.querySelector('button').addEventListener('click', () => {
+        if(confirm('Remover este parceiro do site?')){
+          db.collection('partners').doc(doc.id).delete().then(loadPartners);
+        }
+      });
+      list.appendChild(row);
+    });
+  });
+}
+
+document.getElementById('testiSaveBtn').addEventListener('click', async () => {
+  const nome = document.getElementById('testiNome').value.trim();
+  const cargo = document.getElementById('testiCargo').value.trim();
+  const texto = document.getElementById('testiTexto').value.trim();
+  const statusBox = document.getElementById('testiSaveStatus');
+  const btn = document.getElementById('testiSaveBtn');
+
+  if(!nome || !texto){
+    statusBox.textContent = 'Preenche pelo menos o nome e o texto do depoimento.';
+    return;
+  }
+
+  btn.disabled = true;
+  statusBox.textContent = 'A publicar...';
+
+  try {
+    await db.collection('testimonials').add({
+      nome, cargo, texto,
+      criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    statusBox.textContent = 'Depoimento publicado com sucesso!';
+    document.getElementById('testiNome').value = '';
+    document.getElementById('testiCargo').value = '';
+    document.getElementById('testiTexto').value = '';
+    loadTestimonials();
+  } catch(err){
+    console.error(err);
+    statusBox.textContent = 'Erro ao publicar: ' + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+function loadTestimonials(){
+  const list = document.getElementById('testiList');
+  db.collection('testimonials').orderBy('criadoEm','desc').get().then(snapshot => {
+    if(snapshot.empty){
+      list.innerHTML = '<p class="empty-msg">Ainda não publicaste nenhum depoimento.</p>';
+      return;
+    }
+    list.innerHTML = '';
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML = `
+        <div class="meta"><strong>${d.nome || ''}</strong><span>${d.cargo || ''}</span></div>
+        <button data-id="${doc.id}">Remover</button>
+      `;
+      row.querySelector('button').addEventListener('click', () => {
+        if(confirm('Remover este depoimento do site?')){
+          db.collection('testimonials').doc(doc.id).delete().then(loadTestimonials);
+        }
+      });
+      list.appendChild(row);
+    });
+  });
+}
+
+function loadRatings(){
+  const list = document.getElementById('ratingsList');
+  db.collection('avaliacoes').orderBy('criadoEm','desc').get().then(snapshot => {
+    if(snapshot.empty){
+      list.innerHTML = '<p class="empty-msg">Ainda não há avaliações.</p>';
+      return;
+    }
+    list.innerHTML = '';
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      const stars = '★'.repeat(d.estrelas || 0) + '☆'.repeat(5 - (d.estrelas || 0));
+      row.innerHTML = `
+        <div class="meta"><strong>${stars} ${d.nome ? '· ' + d.nome : ''}</strong><span>${d.comentario || 'Sem comentário'}</span></div>
+        <button data-id="${doc.id}">Remover</button>
+      `;
+      row.querySelector('button').addEventListener('click', () => {
+        if(confirm('Remover esta avaliação?')){
+          db.collection('avaliacoes').doc(doc.id).delete().then(loadRatings);
+        }
+      });
+      list.appendChild(row);
+    });
+  });
+}
+
+function loadSuggestions(){
+  const list = document.getElementById('suggestionsList');
+  db.collection('sugestoes').orderBy('criadoEm','desc').get().then(snapshot => {
+    if(snapshot.empty){
+      list.innerHTML = '<p class="empty-msg">Ainda não há sugestões.</p>';
+      return;
+    }
+    list.innerHTML = '';
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML = `
+        <div class="meta"><strong>${d.nome || 'Anónimo'}</strong><span>${d.texto || ''}</span></div>
+        <button data-id="${doc.id}">Remover</button>
+      `;
+      row.querySelector('button').addEventListener('click', () => {
+        if(confirm('Remover esta sugestão?')){
+          db.collection('sugestoes').doc(doc.id).delete().then(loadSuggestions);
+        }
+      });
+      list.appendChild(row);
+    });
+  });
+}
+
+document.getElementById('activityUploadBtn').addEventListener('click', async () => {
+  const legenda = document.getElementById('activityLegenda').value.trim();
+  const categoria = document.getElementById('activityCategoria').value.trim();
+  const fileInput = document.getElementById('activityFile');
+  const statusBox = document.getElementById('activityUploadStatus');
+  const btn = document.getElementById('activityUploadBtn');
+
+  if(!fileInput.files[0]){
+    statusBox.textContent = 'Escolhe uma imagem primeiro.';
+    return;
+  }
+
+  btn.disabled = true;
+  statusBox.textContent = 'A enviar imagem...';
+
+  try {
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+    const uploadRes = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`,
+      { method: 'POST', body: formData }
+    );
+    const uploadData = await uploadRes.json();
+    if(!uploadData.secure_url){
+      throw new Error(uploadData.error ? uploadData.error.message : 'Falha ao enviar imagem');
+    }
+
+    await db.collection('atividades').add({
+      legenda, categoria, imagemUrl: uploadData.secure_url,
+      criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    statusBox.textContent = 'Publicado com sucesso!';
+    document.getElementById('activityLegenda').value = '';
+    document.getElementById('activityCategoria').value = '';
+    fileInput.value = '';
+    loadActivities();
+  } catch(err){
+    console.error(err);
+    statusBox.textContent = 'Erro ao publicar: ' + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+function loadActivities(){
+  const list = document.getElementById('activityList');
+  db.collection('atividades').orderBy('criadoEm','desc').get().then(snapshot => {
+    if(snapshot.empty){
+      list.innerHTML = '<p class="empty-msg">Ainda não publicaste nenhuma foto.</p>';
+      return;
+    }
+    list.innerHTML = '';
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML = `
+        <img src="${d.imagemUrl}" alt="">
+        <div class="meta"><strong>${d.legenda || 'Sem legenda'}</strong><span>${d.categoria || ''}</span></div>
+        <button data-id="${doc.id}">Remover</button>
+      `;
+      row.querySelector('button').addEventListener('click', () => {
+        if(confirm('Remover esta foto?')){
+          db.collection('atividades').doc(doc.id).delete().then(loadActivities);
+        }
+      });
+      list.appendChild(row);
+    });
+  });
+}
+
+function loadPricing(){
+  db.collection('content').doc('pricing').get().then(docSnap => {
+    if(!docSnap.exists) return;
+    const p = docSnap.data();
+    const fields = {
+      pInicial:'inicial', pEssencial:'essencial', pProfissional:'profissional', pPremium:'premium',
+      pTrafego:'addonTrafego', pGoogleAds:'addonGoogleAds', pVideo:'addonVideo', pFoto:'addonFoto',
+      pLogo:'addonLogo', pIdentidade:'addonIdentidade', pWebsite:'addonWebsite'
+    };
+    Object.keys(fields).forEach(inputId => {
+      if(p[fields[inputId]]) document.getElementById(inputId).value = p[fields[inputId]];
+    });
+  }).catch(err => console.warn('Não foi possível carregar os preços:', err));
+}
+
+document.getElementById('pricingSaveBtn').addEventListener('click', async () => {
+  const statusBox = document.getElementById('pricingSaveStatus');
+  const btn = document.getElementById('pricingSaveBtn');
+  btn.disabled = true;
+  statusBox.textContent = 'A guardar...';
+
+  try {
+    const data = {};
+    const fields = {
+      pInicial:'inicial', pEssencial:'essencial', pProfissional:'profissional', pPremium:'premium',
+      pTrafego:'addonTrafego', pGoogleAds:'addonGoogleAds', pVideo:'addonVideo', pFoto:'addonFoto',
+      pLogo:'addonLogo', pIdentidade:'addonIdentidade', pWebsite:'addonWebsite'
+    };
+    Object.keys(fields).forEach(inputId => {
+      const val = document.getElementById(inputId).value.trim();
+      if(val) data[fields[inputId]] = val;
+    });
+
+    await db.collection('content').doc('pricing').set(data, { merge: true });
+    statusBox.textContent = 'Preços guardados com sucesso!';
+  } catch(err){
+    console.error(err);
+    statusBox.textContent = 'Erro ao guardar: ' + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+function loadContent(){
+  db.collection('content').doc('site').get().then(docSnap => {
+    if(!docSnap.exists) return;
+    const c = docSnap.data();
+    if(c.heroTitulo) document.getElementById('contentHeroTitulo').value = c.heroTitulo;
+    if(c.heroTexto) document.getElementById('contentHeroTexto').value = c.heroTexto;
+    if(c.ofertaTexto) document.getElementById('contentOferta').value = c.ofertaTexto;
+    if(c.founderNome) document.getElementById('contentFounderNome').value = c.founderNome;
+    if(c.founderBio) document.getElementById('contentFounderBio').value = c.founderBio;
+    if(c.founderImagemUrl){
+      const prev = document.getElementById('founderImgPreview');
+      prev.src = c.founderImagemUrl;
+      prev.style.display = 'block';
+      document.getElementById('founderImgPreviewEmpty').style.display = 'none';
+    }
+    if(c.heroImagemUrl){
+      const prev = document.getElementById('heroImgPreview');
+      prev.src = c.heroImagemUrl;
+      prev.style.display = 'block';
+      document.getElementById('heroImgPreviewEmpty').style.display = 'none';
+    }
+    if(c.whatsapp) document.getElementById('contentWhatsapp').value = c.whatsapp;
+    if(c.email) document.getElementById('contentEmail').value = c.email;
+    if(c.endereco) document.getElementById('contentEndereco').value = c.endereco;
+    if(c.facebookUrl) document.getElementById('contentFacebook').value = c.facebookUrl;
+    if(c.instagramUrl) document.getElementById('contentInstagram').value = c.instagramUrl;
+    if(c.statServicos) document.getElementById('contentStatServicos').value = c.statServicos;
+    if(c.statAreas) document.getElementById('contentStatAreas').value = c.statAreas;
+    if(c.statFoco) document.getElementById('contentStatFoco').value = c.statFoco;
+  }).catch(err => console.warn('Não foi possível carregar o conteúdo do site:', err));
+}
+
+document.getElementById('contentHeroImg').addEventListener('change', function(){
+  if(this.files[0]){
+    const prev = document.getElementById('heroImgPreview');
+    prev.src = URL.createObjectURL(this.files[0]);
+    prev.style.display = 'block';
+    document.getElementById('heroImgPreviewEmpty').style.display = 'none';
+  }
+});
+
+document.getElementById('contentFounderImg').addEventListener('change', function(){
+  if(this.files[0]){
+    const prev = document.getElementById('founderImgPreview');
+    prev.src = URL.createObjectURL(this.files[0]);
+    prev.style.display = 'block';
+    document.getElementById('founderImgPreviewEmpty').style.display = 'none';
+  }
+});
+
+document.getElementById('contentSaveBtn').addEventListener('click', async () => {
+  const statusBox = document.getElementById('contentSaveStatus');
+  const btn = document.getElementById('contentSaveBtn');
+  btn.disabled = true;
+  statusBox.textContent = 'A guardar...';
+
+  try {
+    const data = {
+      heroTitulo: document.getElementById('contentHeroTitulo').value.trim(),
+      heroTexto: document.getElementById('contentHeroTexto').value.trim(),
+      ofertaTexto: document.getElementById('contentOferta').value.trim(),
+      whatsapp: document.getElementById('contentWhatsapp').value.trim().replace(/\D/g, ''),
+      email: document.getElementById('contentEmail').value.trim(),
+      endereco: document.getElementById('contentEndereco').value.trim(),
+      facebookUrl: document.getElementById('contentFacebook').value.trim(),
+      instagramUrl: document.getElementById('contentInstagram').value.trim(),
+      statServicos: document.getElementById('contentStatServicos').value.trim(),
+      statAreas: document.getElementById('contentStatAreas').value.trim(),
+      statFoco: document.getElementById('contentStatFoco').value.trim(),
+      founderNome: document.getElementById('contentFounderNome').value.trim(),
+      founderBio: document.getElementById('contentFounderBio').value.trim()
+    };
+
+    const founderImgInput = document.getElementById('contentFounderImg');
+    if(founderImgInput.files[0]){
+      const formData2 = new FormData();
+      formData2.append('file', founderImgInput.files[0]);
+      formData2.append('upload_preset', cloudinaryConfig.uploadPreset);
+      const uploadRes2 = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`,
+        { method: 'POST', body: formData2 }
+      );
+      const uploadData2 = await uploadRes2.json();
+      if(uploadData2.secure_url) data.founderImagemUrl = uploadData2.secure_url;
+    }
+
+    const heroImgInput = document.getElementById('contentHeroImg');
+    if(heroImgInput.files[0]){
+      const formData = new FormData();
+      formData.append('file', heroImgInput.files[0]);
+      formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+      const uploadRes = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`,
+        { method: 'POST', body: formData }
+      );
+      const uploadData = await uploadRes.json();
+      if(uploadData.secure_url) data.heroImagemUrl = uploadData.secure_url;
+    }
+
+    await db.collection('content').doc('site').set(data, { merge: true });
+    statusBox.textContent = 'Alterações guardadas com sucesso!';
+    heroImgInput.value = '';
+    founderImgInput.value = '';
+  } catch(err){
+    console.error(err);
+    statusBox.textContent = 'Erro ao guardar: ' + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
