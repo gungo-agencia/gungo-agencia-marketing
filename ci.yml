@@ -1,0 +1,25 @@
+name: Verificação do site
+
+# Corre automaticamente sempre que alguém abre ou atualiza um Pull Request
+# para o ramo main, e também quando algo é enviado diretamente ao main.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  verificar:
+    name: Verificar HTML e JavaScript
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descarregar o código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Correr verificações do site
+        run: python .github/scripts/check_site.py

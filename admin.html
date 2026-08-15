@@ -4,6 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
+
+<!-- Deteção de erros (Sentry) — mesmo DSN do index.html, ver instruções lá -->
+<script src="https://browser.sentry-cdn.com/8.9.2/bundle.tracing.min.js" crossorigin="anonymous"></script>
+<script>
+  if (typeof Sentry !== 'undefined') {
+    Sentry.init({
+      dsn: "COLA_AQUI_O_DSN_DA_SENTRY",
+      tracesSampleRate: 0.2,
+      beforeSend(event) {
+        if (!Sentry.getClient()?.getOptions()?.dsn || Sentry.getClient().getOptions().dsn.includes('COLA_AQUI')) {
+          return null;
+        }
+        return event;
+      }
+    });
+  }
+</script>
 <title>Área da Equipa | Gungo Agência &amp; Marketing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">

@@ -46,6 +46,18 @@ Mensagens de commit curtas, em português, no imperativo:
 - `Adiciona secção de bastidores`
 - `Melhora contraste do texto no hero`
 
+## Observabilidade e verificação automática (versão adequada ao projeto)
+
+Este projeto é um site estático (HTML/CSS/JS puro, sem build, sem servidor próprio) com Firebase/Firestore e Cloudinary como serviços geridos. Por esse motivo, **não usamos** stacks de observabilidade de nível enterprise (Datadog, New Relic, OpenTelemetry) nem ferramentas de qualidade de código pensadas para monorepos grandes (Biome, Knip, Stryker, Arch-Contract) — seriam desproporcionadas ao tamanho e à natureza do projeto, e implicariam custos e complexidade de manutenção que não fazem sentido aqui.
+
+Em vez disso, este projeto usa uma versão proporcional:
+
+- **Deteção de erros**: [Sentry](https://sentry.io) (plano gratuito), carregado via CDN em `index.html` e `admin.html`. O DSN fica no próprio HTML (não é secreto — é um identificador público de projeto). Se o DSN não estiver preenchido, o Sentry simplesmente não envia nada; o site funciona na mesma.
+- **Verificação automática (CI)**: `.github/workflows/ci.yml` corre `.github/scripts/check_site.py` em cada Pull Request e em cada push para `main`. O script confirma que os ficheiros obrigatórios existem, que as tags HTML e os scripts estão bem fechados, e avisa sobre placeholders esquecidos (`COLA_AQUI...`). Não precisa de Node.js nem de instalação de dependências — só Python, que já vem pronto no GitHub Actions.
+- **Segurança**: cabeçalhos HTTP básicos definidos em `_headers` (aplicados automaticamente pelo Netlify) — proteção contra clickjacking, sniffing de tipo de ficheiro, e a página `/admin.html` marcada explicitamente como não indexável.
+
+Qualquer agente que trabalhe neste projeto deve **manter esta proporção**: antes de sugerir uma ferramenta nova, perguntar "isto resolve um problema real deste projeto, ou é um padrão de equipa grande a ser aplicado sem necessidade?".
+
 ## Notas importantes para qualquer agente
 - Faustino (dono do projeto) **não é programador** — as instruções e explicações devem ser sempre simples, em português, passo a passo, assumindo zero conhecimento técnico
 - Nunca sugerir uso de terminal/linha de comandos como primeira opção — preferir sempre a interface web do GitHub quando possível

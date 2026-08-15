@@ -3,6 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ============================================================
+     DETEÇÃO DE ERROS (Sentry) — gratuito até 5.000 erros/mês
+     1. Cria conta grátis em https://sentry.io
+     2. Cria um projeto do tipo "Browser JavaScript"
+     3. Copia o "DSN" que a Sentry te der
+     4. Substitui COLA_AQUI_O_DSN_DA_SENTRY abaixo por esse valor
+     Sem isto preenchido, o site funciona normalmente (só não há alertas de erro).
+     ============================================================ -->
+<script src="https://browser.sentry-cdn.com/8.9.2/bundle.tracing.min.js" crossorigin="anonymous"></script>
+<script>
+  if (typeof Sentry !== 'undefined') {
+    Sentry.init({
+      dsn: "COLA_AQUI_O_DSN_DA_SENTRY",
+      tracesSampleRate: 0.2,
+      beforeSend(event) {
+        // Não envia nada se o DSN ainda não foi configurado
+        if (!Sentry.getClient()?.getOptions()?.dsn || Sentry.getClient().getOptions().dsn.includes('COLA_AQUI')) {
+          return null;
+        }
+        return event;
+      }
+    });
+  }
+</script>
 <title>Gungo Agência &amp; Marketing | Marketing Digital e Design Gráfico em Luanda</title>
 <meta name="description" content="Gungo Agência &amp; Marketing — agência angolana de marketing digital, tráfego pago e design gráfico. Gestão de redes sociais, branding e identidade visual em Luanda.">
 <meta name="robots" content="index, follow">
@@ -336,11 +361,16 @@
     font-size:0.72rem; font-weight:700; padding:4px 10px; border-radius:var(--r-full); display:flex; align-items:center; gap:5px;
   }
   .gallery-modal{
-    position:fixed; inset:0; background:rgba(6,10,18,0.92); z-index:500; display:none;
+    position:fixed; inset:0; background:rgba(6,10,18,0.92); z-index:500; display:flex;
     align-items:center; justify-content:center; padding:var(--sp-5);
+    opacity:0; visibility:hidden; transition:opacity .3s var(--ease), visibility 0s linear .3s;
   }
-  .gallery-modal.open{display:flex;}
-  .gallery-modal .gm-inner{max-width:900px; width:100%; text-align:center;}
+  .gallery-modal.open{opacity:1; visibility:visible; transition:opacity .3s var(--ease), visibility 0s linear 0s;}
+  .gallery-modal .gm-inner{
+    max-width:900px; width:100%; text-align:center;
+    transform:scale(0.94); transition:transform .3s var(--ease);
+  }
+  .gallery-modal.open .gm-inner{transform:scale(1);}
   .gallery-modal img{max-width:100%; max-height:70vh; border-radius:10px; object-fit:contain; background:#111;}
   .gallery-modal .gm-caption{color:#fff; margin-top:var(--sp-4); font-size:0.95rem;}
   .gallery-modal .gm-close{position:absolute; top:20px; right:26px; color:#fff; font-size:1.8rem; cursor:pointer; background:none; border:none;}
@@ -478,6 +508,31 @@
   .footer-socials a:hover{border-color:var(--gold-light); color:var(--gold-light); transform:translateY(-3px);}
   .footer-bottom{border-top:1px solid rgba(255,255,255,0.1); padding-top:var(--sp-5); display:flex; justify-content:space-between; flex-wrap:wrap; gap:var(--sp-3); font-size:0.8rem; color:#8f97a8;}
 
+  /* ---------- FADE SECTION (entrada/saída suave) ---------- */
+  .fade-section{opacity:0; max-height:0; overflow:hidden; transition:opacity .5s var(--ease), max-height .6s var(--ease), padding .6s var(--ease);}
+  .fade-section.fade-in{opacity:1; max-height:4000px; padding-top:84px; padding-bottom:84px;}
+  .fade-section.fade-out{opacity:0; max-height:0; padding-top:0; padding-bottom:0;}
+
+  /* ---------- BUTTON LOADING (progresso) ---------- */
+  .btn-primary.is-loading, .btn-dark.is-loading{pointer-events:none; opacity:0.75; position:relative; color:transparent;}
+  .btn-primary.is-loading::after, .btn-dark.is-loading::after{
+    content:''; position:absolute; left:50%; top:50%; width:16px; height:16px; margin:-8px 0 0 -8px;
+    border:2px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:50%;
+    animation:btnspin .7s linear infinite;
+  }
+  @keyframes btnspin{to{transform:rotate(360deg);}}
+  @media (prefers-reduced-motion: reduce){ .btn-primary.is-loading::after, .btn-dark.is-loading::after{animation:none;} }
+
+  /* ---------- SKELETON LOADING ---------- */
+  @keyframes shimmer{0%{background-position:-300px 0;} 100%{background-position:300px 0;}}
+  .skel{
+    background:linear-gradient(90deg, var(--hairline) 25%, #f2ece0 37%, var(--hairline) 63%);
+    background-size:600px 100%; animation:shimmer 1.6s linear infinite; border-radius:var(--r-md);
+  }
+  .skel-card{height:260px;}
+  .skel-row{height:100px; border-radius:14px;}
+  @media (prefers-reduced-motion: reduce){ .skel{animation:none; background:var(--hairline);} }
+
   /* ---------- WHATSAPP FLOAT ---------- */
   .wa-float{position:fixed; bottom:26px; right:26px; z-index:200; width:60px; height:60px; border-radius:50%; background:#25D366; color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.6rem; box-shadow:var(--shadow-lg); animation:pulseWa 2.8s ease-in-out infinite;}
   @keyframes pulseWa{0%,100%{box-shadow:var(--shadow-lg), 0 0 0 0 rgba(37,211,102,0.5);} 50%{box-shadow:var(--shadow-lg), 0 0 0 12px rgba(37,211,102,0);}}
@@ -486,15 +541,22 @@
   .chat-float{
     position:fixed; bottom:96px; right:26px; z-index:200; width:56px; height:56px; border-radius:50%;
     background:var(--navy-deep); color:var(--gold-light); border:none; font-size:1.4rem; cursor:pointer;
-    box-shadow:var(--shadow-lg); transition:transform .25s var(--ease);
+    box-shadow:var(--shadow-lg); transition:transform .25s var(--ease), opacity .22s var(--ease), visibility 0s linear 0s;
+    opacity:1; visibility:visible;
   }
+  .chat-float.hidden{opacity:0; visibility:hidden; pointer-events:none; transition:transform .25s var(--ease), opacity .22s var(--ease), visibility 0s linear .22s;}
   .chat-float:hover{transform:scale(1.08);}
   .chat-panel{
     position:fixed; bottom:96px; right:26px; z-index:201; width:320px; max-width:calc(100vw - 40px);
     max-height:460px; background:var(--surface); border-radius:var(--r-lg); box-shadow:var(--shadow-lg);
-    display:none; flex-direction:column; overflow:hidden; border:1px solid var(--hairline);
+    display:flex; flex-direction:column; overflow:hidden; border:1px solid var(--hairline);
+    opacity:0; visibility:hidden; transform:translateY(16px) scale(0.97);
+    transition:opacity .28s var(--ease), transform .28s var(--ease), visibility 0s linear .28s;
   }
-  .chat-panel.open{display:flex;}
+  .chat-panel.open{
+    opacity:1; visibility:visible; transform:translateY(0) scale(1);
+    transition:opacity .28s var(--ease), transform .28s var(--ease), visibility 0s linear 0s;
+  }
   .chat-header{
     background:var(--navy-deep); color:#fff; padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
     font-weight:700; font-size:0.95rem;
@@ -666,7 +728,7 @@
   </div>
 </section>
 
-<section id="parceiros" style="display:none;">
+<section id="parceiros" class="fade-section">
   <div class="wrap">
     <div class="section-head reveal">
       <div class="eyebrow">Parceiros &amp; Marcas</div>
@@ -735,7 +797,7 @@
   </div>
 </section>
 
-<section id="bastidores" style="display:none;">
+<section id="bastidores" class="fade-section">
   <div class="wrap">
     <div class="section-head reveal">
       <div class="eyebrow">Bastidores</div>
@@ -743,7 +805,7 @@
       <p>Momentos de produção, reuniões e trabalho em equipa por trás dos projectos.</p>
     </div>
     <div class="activity-tabs" id="activityTabs"></div>
-    <div id="activityGrid" class="activity-grid"></div>
+    <div id="activityGrid" class="activity-grid"><div class="skel skel-card"></div><div class="skel skel-card"></div><div class="skel skel-card"></div><div class="skel skel-card"></div></div>
   </div>
 </section>
 
@@ -864,7 +926,7 @@
   </div>
 </section>
 
-<section id="portfolio" style="display:none;">
+<section id="portfolio" class="fade-section">
   <div class="wrap">
     <div class="section-head reveal">
       <div class="eyebrow">Projectos</div>
@@ -878,7 +940,7 @@
       <button class="tab-btn" data-cat="Design Gráfico">Design Gráfico</button>
     </div>
     <div id="portfolioGrid" class="portfolio-grid">
-      <p id="portfolioEmpty" style="color:var(--ink-soft); font-size:0.95rem;">Ainda não há projectos publicados. Volte em breve!</p>
+      <div class="skel skel-card"></div><div class="skel skel-card"></div><div class="skel skel-card"></div><div class="skel skel-card"></div>
     </div>
   </div>
 </section>
@@ -927,7 +989,7 @@
   </div>
 </section>
 
-<section id="depoimentos" style="display:none;">
+<section id="depoimentos" class="fade-section">
   <div class="wrap">
     <div class="section-head reveal">
       <div class="eyebrow">Depoimentos</div>
@@ -935,7 +997,7 @@
       <p>Esta secção é atualizada diretamente pela nossa equipa, à medida que novos clientes partilham a sua experiência.</p>
     </div>
     <div id="testimonialsGrid" class="testimonials-grid">
-      <p id="testimonialsEmpty" style="color:var(--ink-soft); font-size:0.95rem;">Ainda não há depoimentos publicados. Volte em breve!</p>
+      <div class="skel skel-card"></div><div class="skel skel-card"></div><div class="skel skel-card"></div>
     </div>
   </div>
 </section>
@@ -1154,6 +1216,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script>
+  // Mostrar os esqueletos de carregamento imediatamente
+  ['portfolio','depoimentos','parceiros','bastidores'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.add('fade-in');
+  });
+
   try {
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
@@ -1233,10 +1301,12 @@
 
     db.collection('portfolio').orderBy('criadoEm','desc').get().then(snapshot => {
       allItems = snapshot.docs.map(doc => doc.data());
+      const sec = document.getElementById('portfolio');
       if(allItems.length > 0){
-        const sec = document.getElementById('portfolio');
-        if(sec) sec.style.display = '';
         renderPortfolio();
+        if(sec) sec.classList.add('fade-in');
+      } else if(sec){
+        sec.classList.add('fade-out');
       }
     }).catch(err => {
       console.error('Erro ao carregar portfólio:', err);
@@ -1418,17 +1488,17 @@
   counters.forEach(c => counterIO.observe(c));
 
   // Carrossel de parceiros
-  const placeholderSlide = ['Espaço para logo','Espaço para logo','Espaço para logo','Espaço para logo','Espaço para logo'];
-  let partnersSlides = [placeholderSlide, placeholderSlide, placeholderSlide];
+  let partnersSlides = [];
   let partnersIndex = 0;
   const partnersStrip = document.getElementById('partnersStrip');
   const partnersDots = document.getElementById('partnersDots');
+  partnersStrip.innerHTML = '<div class="skel skel-row" style="flex:1;"></div>'.repeat(5);
   function renderPartners(){
+    if(partnersSlides.length === 0) return;
     const slide = partnersSlides[partnersIndex];
-    partnersStrip.innerHTML = slide.map(item => {
-      if (typeof item === 'string') return `<div class="partner-slot">${item}</div>`;
-      return `<div class="partner-slot"><img src="${item.logoUrl}" alt="${item.nome || ''}"></div>`;
-    }).join('');
+    partnersStrip.innerHTML = slide.map(item =>
+      `<div class="partner-slot"><img src="${item.logoUrl}" alt="${item.nome || ''}" loading="lazy"></div>`
+    ).join('');
     partnersDots.innerHTML = partnersSlides.map((_, i) => `<span class="${i===partnersIndex?'active':''}" data-i="${i}"></span>`).join('');
     partnersDots.querySelectorAll('span').forEach(dot => {
       dot.addEventListener('click', () => { partnersIndex = parseInt(dot.dataset.i, 10); renderPartners(); });
@@ -1440,25 +1510,30 @@
   document.getElementById('partnersNext').addEventListener('click', () => {
     partnersIndex = (partnersIndex + 1) % partnersSlides.length; renderPartners();
   });
-  renderPartners();
   let partnersAutoTimer = setInterval(() => {
+    if(partnersSlides.length === 0) return;
     partnersIndex = (partnersIndex + 1) % partnersSlides.length; renderPartners();
   }, 5000);
   ['partnersPrev','partnersNext'].forEach(id => {
     document.getElementById(id).addEventListener('click', () => {
+      if(partnersSlides.length === 0) return;
       clearInterval(partnersAutoTimer);
-      partnersAutoTimer = setInterval(() => { partnersIndex = (partnersIndex + 1) % partnersSlides.length; renderPartners(); }, 5000);
+      partnersAutoTimer = setInterval(() => {
+        if(partnersSlides.length === 0) return;
+        partnersIndex = (partnersIndex + 1) % partnersSlides.length; renderPartners();
+      }, 5000);
     });
   });
 
   if (window.db) {
     window.db.collection('testimonials').orderBy('criadoEm','desc').get().then(snapshot => {
       const grid = document.getElementById('testimonialsGrid');
+      const sec = document.getElementById('depoimentos');
       if (snapshot.empty){
+        if(sec) sec.classList.add('fade-out');
         return;
       }
-      const sec = document.getElementById('depoimentos');
-      if(sec) sec.style.display = '';
+      if(sec) sec.classList.add('fade-in');
       grid.innerHTML = snapshot.docs.map(doc => {
         const d = doc.data();
         const inicial = (d.nome || '?').trim().charAt(0).toUpperCase();
@@ -1479,8 +1554,11 @@
 
   if (window.db) {
     window.db.collection('atividades').orderBy('criadoEm','desc').get().then(snapshot => {
-      if(snapshot.empty) return;
       const sec = document.getElementById('bastidores');
+      if(snapshot.empty){
+        if(sec) sec.classList.add('fade-out');
+        return;
+      }
       const items = snapshot.docs.map(doc => doc.data());
       const categorias = ['Todos', ...new Set(items.map(i => i.categoria).filter(Boolean))];
       const tabsEl = document.getElementById('activityTabs');
@@ -1510,13 +1588,15 @@
       }
 
       renderActivity();
-      sec.style.display = '';
+      sec.classList.add('fade-in');
     }).catch(err => console.warn('Não foi possível carregar os bastidores:', err));
   }
 
   if (window.db) {
     window.db.collection('partners').orderBy('criadoEm','desc').get().then(snapshot => {
+      const sec = document.getElementById('parceiros');
       if (snapshot.empty){
+        if(sec) sec.classList.add('fade-out');
         return;
       }
       const items = snapshot.docs.map(doc => doc.data());
@@ -1525,8 +1605,7 @@
       partnersSlides = chunks;
       partnersIndex = 0;
       renderPartners();
-      const sec = document.getElementById('parceiros');
-      if(sec) sec.style.display = '';
+      if(sec) sec.classList.add('fade-in');
     }).catch(err => console.warn('Não foi possível carregar os parceiros:', err));
   }
 
@@ -1552,6 +1631,7 @@
   document.getElementById('ratingForm').addEventListener('submit', async function(e){
     e.preventDefault();
     const status = document.getElementById('ratingStatus');
+    const btn = this.querySelector('button[type="submit"]');
     if(selectedStars === 0){
       status.textContent = 'Escolha de 1 a 5 estrelas antes de enviar.';
       return;
@@ -1560,6 +1640,7 @@
       status.textContent = 'Não foi possível enviar agora. Tente mais tarde.';
       return;
     }
+    if(btn) btn.classList.add('is-loading');
     try{
       await window.db.collection('avaliacoes').add({
         estrelas: selectedStars,
@@ -1575,18 +1656,22 @@
     }catch(err){
       status.textContent = 'Erro ao enviar. Tente novamente.';
       console.error(err);
+    } finally {
+      if(btn) btn.classList.remove('is-loading');
     }
   });
 
   document.getElementById('suggestionForm').addEventListener('submit', async function(e){
     e.preventDefault();
     const status = document.getElementById('suggestionStatus');
+    const btn = this.querySelector('button[type="submit"]');
     const texto = document.getElementById('suggestionTexto').value.trim();
     if(!texto) return;
     if(!window.db){
       status.textContent = 'Não foi possível enviar agora. Tente mais tarde.';
       return;
     }
+    if(btn) btn.classList.add('is-loading');
     try{
       await window.db.collection('sugestoes').add({
         texto,
@@ -1598,6 +1683,8 @@
     }catch(err){
       status.textContent = 'Erro ao enviar. Tente novamente.';
       console.error(err);
+    } finally {
+      if(btn) btn.classList.remove('is-loading');
     }
   });
 
@@ -1668,11 +1755,16 @@
 
   document.getElementById('leadForm').addEventListener('submit', function(e){
     e.preventDefault();
+    const btn = this.querySelector('button[type="submit"]');
+    if(btn) btn.classList.add('is-loading');
     const nome = document.getElementById('f_nome').value;
     const whats = document.getElementById('f_whats').value;
     const servico = document.getElementById('f_servico').value;
     let msg = `Olá! Meu nome é ${nome}. Tenho interesse em: ${servico}. O meu contacto é ${whats}.`;
-    window.open('https://wa.me/' + (window.siteContent && window.siteContent.whatsapp ? window.siteContent.whatsapp : '244942375519') + '?text=' + encodeURIComponent(msg), '_blank');
+    setTimeout(() => {
+      window.open('https://wa.me/' + (window.siteContent && window.siteContent.whatsapp ? window.siteContent.whatsapp : '244942375519') + '?text=' + encodeURIComponent(msg), '_blank');
+      if(btn) btn.classList.remove('is-loading');
+    }, 350);
   });
 </script>
 <script>
@@ -1741,14 +1833,14 @@
 
   chatFloatBtn.addEventListener('click', () => {
     chatPanel.classList.add('open');
-    chatFloatBtn.style.display = 'none';
+    chatFloatBtn.classList.add('hidden');
     startChat();
     chatInput.focus();
   });
 
   chatCloseBtn.addEventListener('click', () => {
     chatPanel.classList.remove('open');
-    chatFloatBtn.style.display = 'flex';
+    chatFloatBtn.classList.remove('hidden');
   });
 
   chatInputForm.addEventListener('submit', function(e){
